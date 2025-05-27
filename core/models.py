@@ -1,0 +1,36 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils.text import slugify
+
+from ckeditor_uploader.fields import RichTextUploadingField
+from taggit.managers import TaggableManager
+from unidecode import unidecode
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True, max_length=100)
+    description = RichTextUploadingField()
+    content = RichTextUploadingField()
+    image = models.ImageField(upload_to='post_images/',
+                              default='post_images/default.png')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    tags = TaggableManager()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(unidecode(self.title))[:90]
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-created_at']
