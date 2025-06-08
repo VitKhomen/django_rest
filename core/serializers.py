@@ -1,11 +1,16 @@
+from .models import Comment
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.utils.html import strip_tags
+
 from taggit.models import Tag
 
-from .models import Post
+from .models import Post, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
+    description = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
 
     tags = serializers.SlugRelatedField(
         many=True,
@@ -23,6 +28,12 @@ class PostSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
+
+    def get_description(self, obj):
+        return strip_tags(obj.description)[:300] + "..."
+
+    def get_content(self, obj):
+        return strip_tags(obj.content)[:300] + "..."
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -73,3 +84,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    author = serializers.SlugRelatedField(
+        slug_field="username", queryset=User.objects.all())
+    post = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Post.objects.all())
+
+    class Meta:
+        model = Comment
+        fields = ("id", "post", "author", "text", "created_date")
+        lookup_field = 'id'
+        extra_kwargs = {
+            'url': {'lookup_field': 'id'}
+        }

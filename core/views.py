@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404
 from taggit.models import Tag
 
 from .serializers import PostSerializer, TagSerializer, ContactSerializer, \
-    RegisterSerializer, UserSerializer
-from .models import Post
+    RegisterSerializer, UserSerializer, CommentSerializer
+from .models import Post, Comment
 
 
 class PageNumberSetPagination(pagination.PageNumberPagination):
@@ -99,3 +99,14 @@ class ProfileView(generics.GenericAPIView):
                 context=self.get_serializer_context()
             ).data,
         })
+
+
+class CommentView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        post_slug = self.kwargs['post_slug'].lower()
+        post = get_object_or_404(Post, slug=post_slug)
+        return Comment.objects.filter(post=post)
