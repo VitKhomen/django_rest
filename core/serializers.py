@@ -33,14 +33,15 @@ class PostSerializer(serializers.ModelSerializer):
         return strip_tags(obj.description)[:300] + "..."
 
     def get_content(self, obj):
-        return strip_tags(obj.content)[:300] + "..."
+        return strip_tags(obj.content)
 
 
 class TagSerializer(serializers.ModelSerializer):
+    post_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Tag
-        fields = ('name',)
+        fields = ('name', 'post_count')
         lookup_field = 'name'
         extra_kwargs = {
             'url': {'lookup_field': 'name'}

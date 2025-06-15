@@ -3,6 +3,7 @@ from rest_framework import viewsets, filters, pagination, generics, \
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 
 from taggit.models import Tag
 
@@ -40,13 +41,15 @@ class TagDetailView(generics.ListAPIView):
 
 
 class TagView(generics.ListAPIView):
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.annotate(
+        post_count=Count('taggit_taggeditem_items')
+    ).filter(post_count__gt=0).order_by('-post_count')[:10]
     serializer_class = TagSerializer
     permission_classes = [permissions.AllowAny]
 
 
 class AsideView(generics.ListAPIView):
-    queryset = Post.objects.all().order_by('-id')[:5]
+    queryset = Post.objects.all().order_by('-id')[:3]
     serializer_class = PostSerializer
     permission_classes = [permissions.AllowAny]
 
