@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
+from django.db.models import Q
 
 from taggit.models import Tag
 
@@ -23,10 +24,22 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'description', 'content']
+    search_fields = ['title', 'description', 'content', 'tags__name']
     ordering_fields = ['created_at', 'title']
     pagination_class = PageNumberSetPagination
     permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(content__icontains=search_query) |
+                Q(tags__name__icontains=search_query)
+            ).distinct()
+        return queryset
 
 
 class TagDetailView(generics.ListAPIView):
