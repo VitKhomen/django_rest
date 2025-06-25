@@ -1,10 +1,13 @@
 from rest_framework import viewsets, filters, pagination, generics, \
-    permissions, views
+    permissions, views, status
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.db.models import Q
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from taggit.models import Tag
 
@@ -126,3 +129,18 @@ class CommentView(generics.ListCreateAPIView):
         post_slug = self.kwargs['post_slug'].lower()
         post = get_object_or_404(Post, slug=post_slug)
         return Comment.objects.filter(post=post)
+
+
+class LogUotView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except KeyError:
+            return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except TokenError:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
