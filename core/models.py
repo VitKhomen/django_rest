@@ -1,10 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
+from django.conf import settings
 
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 from unidecode import unidecode
+
+
+class CustomUser(AbstractUser):
+    avatar = models.ImageField(
+        upload_to='avatars/', default='avatars/default.png', blank=True, null=True)
 
 
 class Post(models.Model):
@@ -14,7 +20,8 @@ class Post(models.Model):
     content = RichTextUploadingField()
     image = models.ImageField(upload_to='post_images/',
                               default='post_images/default.png')
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
 
@@ -40,7 +47,7 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='author_comments')
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='author_comments')
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
 

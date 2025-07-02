@@ -158,6 +158,8 @@ CKEDITOR_CONFIGS = {
 # настройки JWT токена
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'core.CustomUser'
+
 LOGIN_URL = "/api/v1/signin"
 
 SIMPLE_JWT = {
@@ -166,7 +168,10 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-CORS_ORIGIN_WHITELIST = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # настройки rest framework
 REST_FRAMEWORK = {

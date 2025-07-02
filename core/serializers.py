@@ -1,11 +1,10 @@
 from .models import Comment
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from django.utils.html import strip_tags
 
 from taggit.models import Tag
 
-from .models import Post, Comment
+from .models import Post, Comment, CustomUser
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -18,7 +17,7 @@ class PostSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all()
     )
     author = serializers.SlugRelatedField(
-        slug_field="username", queryset=User.objects.all())
+        slug_field="username", queryset=CustomUser.objects.all())
 
     class Meta:
         model = Post
@@ -56,26 +55,23 @@ class ContactSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-
     password2 = serializers.CharField(write_only=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = [
             "username",
             "password",
             "password2",
+            "avatar",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        username = validated_data["username"]
-        password = validated_data["password"]
-        password2 = validated_data["password2"]
-        if password != password2:
-            raise serializers.ValidationError(
-                {"password": "Пароли не совпадают"})
-        user = User(username=username)
+        password = validated_data.pop("password")
+        validated_data.pop("password2")
+        user = CustomUser(**validated_data)
         user.set_password(password)
         user.save()
         return user
@@ -83,21 +79,24 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        exclude = ['password']
+        model = CustomUser
+        fields = ('id', 'username', 'email', 'avatar',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
-
     author = serializers.SlugRelatedField(
-        slug_field="username", queryset=User.objects.all())
+        slug_field="username", queryset=CustomUser.objects.all())
+    author_avatar = serializers.SerializerMethodField()
+
     post = serializers.SlugRelatedField(
         slug_field="slug", queryset=Post.objects.all())
 
     class Meta:
         model = Comment
-        fields = ("id", "post", "author", "text", "created_date")
-        lookup_field = 'id'
-        extra_kwargs = {
-            'url': {'lookup_field': 'id'}
-        }
+        fields = ("id", "post", "author",
+                  "author_avatar", "text", "created_date")
+
+    def get_author_avatar(self, obj):
+        if obj.author.avatar:
+            return obj.author.avatar.url
+        return None
