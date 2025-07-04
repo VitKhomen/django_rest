@@ -144,3 +144,8 @@ class CommentView(generics.ListCreateAPIView):
         post_slug = self.kwargs['post_slug'].lower()
         post = get_object_or_404(Post, slug=post_slug)
         return Comment.objects.filter(post=post)
+
+    def perform_create(self, serializer):
+        post_slug = self.kwargs['post_slug'].lower()
+        post = get_object_or_404(Post, slug=post_slug)
+        serializer.save(post=post, author=self.request.user)

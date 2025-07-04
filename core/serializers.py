@@ -84,17 +84,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        slug_field="username", queryset=CustomUser.objects.all())
+    author = serializers.SerializerMethodField()
     author_avatar = serializers.SerializerMethodField()
-
-    post = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Post.objects.all())
 
     class Meta:
         model = Comment
-        fields = ("id", "post", "author",
-                  "author_avatar", "text", "created_date")
+        fields = ("id", "author", "author_avatar", "text", "created_date")
+        read_only_fields = ("author", "author_avatar", "created_date")
+
+    def get_author(self, obj):
+        return obj.author.username
 
     def get_author_avatar(self, obj):
         if obj.author.avatar:
