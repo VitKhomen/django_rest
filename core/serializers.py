@@ -62,11 +62,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "username",
+            "email",
             "password",
             "password2",
             "avatar",
         ]
         extra_kwargs = {"password": {"write_only": True}}
+
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError(
+                {"password2": "Пароли не совпадают"})
+        return data
 
     def create(self, validated_data):
         password = validated_data.pop("password")
@@ -96,6 +103,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return obj.author.username
 
     def get_author_avatar(self, obj):
+        request = self.context.get('request')
         if obj.author.avatar:
-            return obj.author.avatar.url
+            return request.build_absolute_uri(obj.author.avatar.url)
         return None
