@@ -146,3 +146,15 @@ class CommentView(generics.ListCreateAPIView):
         post_slug = self.kwargs['post_slug'].lower()
         post = get_object_or_404(Post, slug=post_slug)
         serializer.save(post=post, author=self.request.user)
+
+
+class CommentDetaliView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.delete()
