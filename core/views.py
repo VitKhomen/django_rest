@@ -12,7 +12,7 @@ from taggit.models import Tag
 
 from .serializers import PostSerializer, TagSerializer, ContactSerializer, \
     RegisterSerializer, UserSerializer, CommentSerializer
-from .models import Post, Comment
+from .models import Post, Comment, CustomUser
 
 
 class PageNumberSetPagination(pagination.PageNumberPagination):
@@ -42,6 +42,17 @@ class PostViewSet(viewsets.ModelViewSet):
                 Q(tags__name__icontains=search_query)
             ).distinct()
         return queryset
+
+
+class UserPostsView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = PageNumberSetPagination
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        user = get_object_or_404(CustomUser, username=username)
+        return Post.objects.filter(author=user)
 
 
 class TagDetailView(generics.ListAPIView):
@@ -129,6 +140,19 @@ class ProfileView(generics.GenericAPIView):
                 request.user,
                 context=self.get_serializer_context()
             ).data,
+        })
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+            partial=True  # Можно изменить на False, если хочешь требовать все поля
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            "user": serializer.data,
+            "message": "Профиль успешно обновлён"
         })
 
 

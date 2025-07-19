@@ -87,7 +87,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'email', 'avatar',)
+        fields = ('id', 'username', 'email', 'avatar', 'date_joined',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
