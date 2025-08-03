@@ -29,7 +29,12 @@ class PostViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description', 'content', 'tags__name']
     ordering_fields = ['created_at', 'title']
     pagination_class = PageNumberSetPagination
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        # Мы говорим сериализатору: "при сохранении, пожалуйста,
+        # в поле 'author' запиши текущего пользователя, сделавшего запрос"
+        serializer.save(author=self.request.user)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -121,13 +126,8 @@ class LogoutView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        # Просто возвращаем 205 без blacklisting
+        return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
 class ProfileView(generics.GenericAPIView):

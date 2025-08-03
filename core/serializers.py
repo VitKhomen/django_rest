@@ -1,28 +1,25 @@
+from os import read
 from .models import Comment
 from rest_framework import serializers
 from django.utils.html import strip_tags
 
 from taggit.models import Tag
+from taggit.serializers import (TaggitSerializer, TagListSerializerField)
 
 from .models import Post, Comment, CustomUser
 
 
-class PostSerializer(serializers.ModelSerializer):
-    description = serializers.SerializerMethodField()
-    content = serializers.SerializerMethodField()
+class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
 
-    tags = serializers.SlugRelatedField(
-        many=True,
-        slug_field='name',
-        queryset=Tag.objects.all()
-    )
+    tags = TagListSerializerField()
     author = serializers.SlugRelatedField(
-        slug_field="username", queryset=CustomUser.objects.all())
+        slug_field="username", read_only=True)
 
     class Meta:
         model = Post
         fields = ("id", "title", "slug", "description",
                   "content", "image", "created_at", "author", "tags")
+        read_only_fields = ("slug", "created_at")
         lookup_field = 'slug'
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}

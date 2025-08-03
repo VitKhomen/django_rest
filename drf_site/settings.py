@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'taggit',
     'rest_framework_simplejwt.token_blacklist',
+    'taggit_serializer',
     'core',
 ]
 
