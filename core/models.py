@@ -7,10 +7,11 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 from unidecode import unidecode
 
+from cloudinary.models import CloudinaryField
+
 
 class CustomUser(AbstractUser):
-    avatar = models.ImageField(
-        upload_to='avatars/', default='avatars/default.png', blank=True, null=True)
+    avatar = CloudinaryField('avatar_image', default='default_avatar_image')
 
 
 class Post(models.Model):
@@ -18,8 +19,7 @@ class Post(models.Model):
     slug = models.SlugField(unique=True, blank=True, max_length=100)
     description = RichTextUploadingField()
     content = RichTextUploadingField()
-    image = models.ImageField(upload_to='post_images/',
-                              default='post_images/default.png')
+    image = CloudinaryField('post_image', default='default_post_image')
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
