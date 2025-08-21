@@ -14,6 +14,7 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
     author = serializers.SlugRelatedField(
         slug_field="username", read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -30,6 +31,14 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     def get_content(self, obj):
         return strip_tags(obj.content)
+
+    def get_image(self, obj):
+        # Проверяем, есть ли у объекта изображение
+        if obj.image and hasattr(obj.image, 'url'):
+            # Возвращаем абсолютный URL из атрибута .url
+            return obj.image.url
+        # Если изображения нет, можно вернуть URL для заглушки или None
+        return None
 
 
 class TagSerializer(serializers.ModelSerializer):
