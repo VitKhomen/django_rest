@@ -84,16 +84,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    avatar = serializers.SerializerMethodField()
+    image = serializers.ImageField(
+        use_url=True, required=False, allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ('id', 'username', 'email', 'avatar', 'date_joined',)
-
-    def get_avatar(self, obj):
-        if obj.avatar and hasattr(obj.avatar, 'url'):
-            return obj.avatar.url
-        return "https://res.cloudinary.com/xxx/image/upload/v123456789/default_avatar.png"
 
 
 class CommentSerializer(serializers.ModelSerializer):
