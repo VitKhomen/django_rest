@@ -145,7 +145,7 @@ CLOUDINARY_STORAGE = {
 }
 
 # Куда загружать изображения
-CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_PATH = ""
 
 # Бэкенд обработки изображений
 CKEDITOR_IMAGE_BACKEND = "pillow"
