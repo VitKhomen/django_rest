@@ -84,7 +84,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(
+    avatar = serializers.ImageField(
         use_url=True, required=False, allow_null=True)
 
     class Meta:
