@@ -19,7 +19,8 @@ class Post(models.Model):
     slug = models.SlugField(unique=True, blank=True, max_length=100)
     description = RichTextUploadingField()
     content = RichTextUploadingField()
-    image = CloudinaryField('post_image', default='default_post_image')
+    image = CloudinaryField(
+        'post_image', default='https://res.cloudinary.com/dlupcjis0/image/upload/v1746993289/default_post_image.jpg')
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
