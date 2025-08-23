@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.db.models import Q
 
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from taggit.models import Tag
 
@@ -32,8 +31,6 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        # Мы говорим сериализатору: "при сохранении, пожалуйста,
-        # в поле 'author' запиши текущего пользователя, сделавшего запрос"
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
@@ -126,7 +123,7 @@ class LogoutView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        # Просто возвращаем 205 без blacklisting
+
         return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
@@ -146,13 +143,13 @@ class ProfileView(generics.GenericAPIView):
         serializer = self.get_serializer(
             request.user,
             data=request.data,
-            partial=True  # Можно изменить на False, если хочешь требовать все поля
+            partial=True
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({
             "user": serializer.data,
-            "message": "Профиль успешно обновлён"
+            "message": "Профіль успішно оновлен"
         })
 
 

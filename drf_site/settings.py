@@ -191,11 +191,11 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # для локальной разработки Nuxt
-    "http://127.0.0.1:3000",  # иногда браузеры ходят через 127.0.0.1
-    "https://nuxt-js-forum.vercel.app",  # твой основной продакшен-домен
-    "https://nuxt-js-forum-git-main-vitaliys-projects-474f852a.vercel.app",  # превью-деплой
-    # еще один превью-деплой
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://nuxt-js-forum.vercel.app",
+    "https://nuxt-js-forum-git-main-vitaliys-projects-474f852a.vercel.app",
+
     "https://nuxt-js-forum-jrm9w26lb-vitaliys-projects-474f852a.vercel.app",
 ]
 
