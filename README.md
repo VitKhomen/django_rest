@@ -8,7 +8,7 @@ Frontend: Nuxt.js (хостинг – Vercel)
 
 📌 Це бекенд для форуму на Django REST Framework, який працює разом із фронтендом на Nuxt.js.
 Фронтенд доступний тут
-https://github.com/VitKhomen/nuxt_js_forum.git
+https://github.com/VitKhomen/nuxt_js_forum.git,
 https://nuxt-js-forum.vercel.app
 
 ## 🚀 Деплой
